@@ -1,0 +1,4 @@
+selenium==4.25.0
+pandas==2.2.3
+yt-dlp==2024.10.22
+webdriver-manager==4.0.2
