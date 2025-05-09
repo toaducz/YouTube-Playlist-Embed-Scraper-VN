@@ -1,4 +1,4 @@
-
+Nhận vào link playlist, ví dụ https://www.youtube.com/c/MuseViệtNam/playlists
 
 git clone https://github.com/toaducz/YouTube-Playlist-Embed-Scraper.git
 
