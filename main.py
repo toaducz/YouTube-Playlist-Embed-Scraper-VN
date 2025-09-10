@@ -77,17 +77,28 @@ def get_videos_from_playlist(playlist_url):
             print(f"Lỗi khi xử lý playlist {playlist_url}: {e}")
             return None, []
 
-channel_playlists_url = "https://www.youtube.com/c/MuseViệtNam/playlists"  # URL kênh, ví dụ là MuseVn
+channel_playlists_url = "https://www.youtube.com/@AniOneVietnam/playlists"  # URL playlist kênh
 results = get_playlists_from_channel_playlists_tab(channel_playlists_url)
-write_playlists_to_csv(results)
 
-# xóa lặp
-df = pd.read_csv('playlists.csv')
+# === Lấy tên channel từ URL ===
+channel_name = channel_playlists_url.split("@")[-1].replace("/playlists", "")
+# Nếu là link dạng /channel/UCxxxx thì nên đổi sang cách khác, ở đây ta xử lý @handle
+
+# File tạm cho playlists
+playlists_csv = f"{channel_name}_playlists.csv"
+playlists_cleaned_csv = f"{channel_name}_playlists_cleaned.csv"
+videos_csv = f"{channel_name}_videos.csv"
+
+# === Xuất playlists ban đầu ===
+write_playlists_to_csv(results, output_file=playlists_csv)
+
+# === Xóa trùng Playlist ID ===
+df = pd.read_csv(playlists_csv)
 df_cleaned = df.drop_duplicates(subset=['Playlist ID'], keep='first')
-df_cleaned.to_csv('playlists_cleaned.csv', index=False)
-print("Đã xóa các Playlist ID trùng lặp. Kết quả được lưu trong 'playlists_cleaned.csv'.")
+df_cleaned.to_csv(playlists_cleaned_csv, index=False)
+print(f"Đã xóa các Playlist ID trùng lặp. Kết quả được lưu trong '{playlists_cleaned_csv}'.")
 
-# lưu id cào link
+# === Cào video từ các playlist ===
 all_videos_data = []
 for index, row in df_cleaned.iterrows():
     playlist_id = row['Playlist ID']
@@ -112,10 +123,10 @@ for index, row in df_cleaned.iterrows():
     else:
         print(f"Không thể lấy dữ liệu từ playlist {playlist_url}\n")
 
-# Lưu thông tin video vào CSV
+# === Lưu thông tin video vào CSV theo tên channel ===
 if all_videos_data:
     videos_df = pd.DataFrame(all_videos_data)
-    videos_df.to_csv('videos_from_playlists.csv', index=False)
-    print("Đã lưu thông tin video vào 'videos_from_playlists.csv'.")
+    videos_df.to_csv(videos_csv, index=False)
+    print(f"Đã lưu thông tin video vào '{videos_csv}'.")
 else:
     print("Không có dữ liệu video để lưu.")
